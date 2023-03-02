@@ -17,7 +17,7 @@ func NewOffsetScanner(r io.Reader) (*OffsetScanner, error) {
 		Scanner: scanner,
 	}
 
-	scanLines := func(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		defer func() {
 			offsetScanner.offset += int64(advance)
 		}()
@@ -31,8 +31,7 @@ func NewOffsetScanner(r io.Reader) (*OffsetScanner, error) {
 			return len(data), dropCR(data), nil
 		}
 		return 0, nil, nil
-	}
-	scanner.Split(scanLines)
+	})
 
 	return offsetScanner, nil
 }
