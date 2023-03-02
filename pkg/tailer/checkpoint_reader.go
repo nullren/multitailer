@@ -6,6 +6,10 @@ import (
 	"sync"
 )
 
+// CheckpointReader reads lines from files, starting from the last read position.
+// To read a file, call ReadLines with the file name. The file will be opened
+// and read from the last read position. The file will be closed when the
+// CheckpointReader is closed. If the file is deleted, it will be ignored.
 type CheckpointReader struct {
 	checkpoints map[string]Checkpoint
 
@@ -15,6 +19,7 @@ type CheckpointReader struct {
 	sync.Mutex
 }
 
+// NewCheckpointReader returns a new CheckpointReader.
 func NewCheckpointReader() *CheckpointReader {
 	return &CheckpointReader{
 		checkpoints: make(map[string]Checkpoint),
@@ -40,6 +45,10 @@ func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error
 		checkpoint.Offset = 0
 	}
 
+	// TODO: check if file was renamed or truncated, which would trigger re-reading the file.
+
+	// restrict the read size to maxReadSize so that one large file
+	// doesn't dominate the read loop.
 	reader := io.NewSectionReader(checkpoint.File, checkpoint.Offset, r.maxReadSize)
 
 	scanner, err := NewBytesReadScanner(reader)

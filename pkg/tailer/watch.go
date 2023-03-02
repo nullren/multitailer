@@ -11,6 +11,8 @@ import (
 // end the watch.
 type WatchFunc = func(file, line string) error
 
+// Watch watches a directory for files and new content and calls
+// watchFunc for each new line of content.
 func Watch(ctx context.Context, dir string, watchFunc WatchFunc) error {
 	files := NewFiles(dir)
 	go files.RunUpdater(ctx)
