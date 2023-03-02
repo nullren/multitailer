@@ -3,10 +3,12 @@ package tailer
 import (
 	"io/fs"
 	"os"
+	"sync"
 )
 
 type Files struct {
-	Files []string `json:"files"`
+	files []string
+	*sync.Mutex
 }
 
 func NewFiles(dir string) (Files, error) {
@@ -18,5 +20,11 @@ func NewFiles(dir string) (Files, error) {
 		}
 		return nil
 	})
-	return Files{files}, err
+	return Files{files: files}, err
+}
+
+func (f *Files) Files() []string {
+	f.Lock()
+	defer f.Unlock()
+	return f.files
 }

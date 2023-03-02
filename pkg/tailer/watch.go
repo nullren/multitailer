@@ -2,10 +2,13 @@ package tailer
 
 import (
 	"context"
+	"time"
 )
 
 // WatchFunc is a function that is called when a file has
-// new content. Parameters are (file, content).
+// new content. It is called for each new line data.
+// Parameters are (file, line). Returning an error will
+// end the watch.
 type WatchFunc = func(string, string) error
 
 func Watch(ctx context.Context, dir string, watchFunc WatchFunc) error {
@@ -14,19 +17,25 @@ func Watch(ctx context.Context, dir string, watchFunc WatchFunc) error {
 		return err
 	}
 
+	reader := NewCheckpointReader()
+
 	for {
-		for _, file := range files.Files {
+		for _, file := range files.Files() {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
 			default:
-				// TODO: get next line of file
-				// lines := file.ReadLines()
-				if err := watchFunc(file, ""); err != nil {
+				lines, err := reader.ReadLines(file)
+				if err != nil {
 					return err
 				}
+				for _, line := range lines {
+					if err := watchFunc(file, line); err != nil {
+						return err
+					}
+				}
 			}
-			// time.Sleep(1 * time.Second)
 		}
+		time.Sleep(1 * time.Second)
 	}
 }
