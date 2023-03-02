@@ -2,6 +2,7 @@ package tailer
 
 import (
 	"context"
+	"fmt"
 	"time"
 )
 
@@ -35,6 +36,7 @@ func Watch(ctx context.Context, dir string, watchFunc WatchFunc) error {
 						return err
 					}
 				}
+				fmt.Printf("read %d lines from %s\n", len(lines), file)
 			}
 		}
 		time.Sleep(1 * time.Second)

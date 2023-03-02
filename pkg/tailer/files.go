@@ -2,6 +2,7 @@ package tailer
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -39,6 +40,7 @@ func (f *Files) UpdateFiles() error {
 		return err
 	}
 
+	fmt.Printf("found files: %v", files)
 	f.files = files
 	return nil
 }
