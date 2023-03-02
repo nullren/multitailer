@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	if err := tailer.Watch(context.Background(), "/var/log", func(file, content string) error {
+	if err := tailer.Watch(context.Background(), "/var/log", func(file, line string) error {
 		// fmt.Printf("%s: %s\n", file, content)
 		return nil
 	}); err != nil {

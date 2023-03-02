@@ -6,20 +6,22 @@ import (
 	"io"
 )
 
-type OffsetScanner struct {
-	offset int64
+// BytesReadScanner is a bufio.Scanner that also keeps track of the number of bytes read.
+type BytesReadScanner struct {
+	bytesRead int64
 	*bufio.Scanner
 }
 
-func NewOffsetScanner(r io.Reader) (*OffsetScanner, error) {
+// NewBytesReadScanner returns a new BytesReadScanner that reads from r.
+func NewBytesReadScanner(r io.Reader) (*BytesReadScanner, error) {
 	scanner := bufio.NewScanner(r)
-	offsetScanner := &OffsetScanner{
+	bytesReadScanner := &BytesReadScanner{
 		Scanner: scanner,
 	}
 
 	scanner.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		defer func() {
-			offsetScanner.offset += int64(advance)
+			bytesReadScanner.bytesRead += int64(advance)
 		}()
 		if atEOF && len(data) == 0 {
 			return 0, nil, nil
@@ -33,11 +35,12 @@ func NewOffsetScanner(r io.Reader) (*OffsetScanner, error) {
 		return 0, nil, nil
 	})
 
-	return offsetScanner, nil
+	return bytesReadScanner, nil
 }
 
-func (s *OffsetScanner) Offset() int64 {
-	return s.offset
+// BytesRead returns the number of bytes read by the scanner.
+func (s *BytesReadScanner) BytesRead() int64 {
+	return s.bytesRead
 }
 
 func dropCR(data []byte) []byte {

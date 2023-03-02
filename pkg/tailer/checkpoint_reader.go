@@ -1,7 +1,6 @@
 package tailer
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"sync"
@@ -20,6 +19,7 @@ func NewCheckpointReader() *CheckpointReader {
 
 const MAX_READ_SIZE = 1024 * 1024 * 1024
 
+// ReadLines reads lines from a file, starting from the last read position.
 func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error) {
 	r.Lock()
 	defer r.Unlock()
@@ -39,7 +39,7 @@ func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error
 
 	reader := io.NewSectionReader(checkpoint.File, checkpoint.Offset, MAX_READ_SIZE)
 
-	scanner, err := NewOffsetScanner(reader)
+	scanner, err := NewBytesReadScanner(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -48,13 +48,12 @@ func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error
 		lines = append(lines, scanner.Text())
 	}
 
-	fmt.Printf("%s\t%d\t%d\t%d\n", fileName, len(lines), checkpoint.Offset, scanner.Offset())
-
-	checkpoint.Offset += scanner.Offset()
+	checkpoint.Offset += scanner.BytesRead()
 	r.checkpoints[fileName] = checkpoint
 	return lines, nil
 }
 
+// Close closes all open files.
 func (r *CheckpointReader) Close() error {
 	r.Lock()
 	defer r.Unlock()
