@@ -1,4 +1,4 @@
-package tailer
+package multitailer
 
 import (
 	"fmt"
