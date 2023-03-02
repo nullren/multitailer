@@ -2,7 +2,6 @@ package tailer
 
 import (
 	"context"
-	"fmt"
 	"time"
 )
 
@@ -26,7 +25,6 @@ func Watch(ctx context.Context, dir string, watchFunc WatchFunc) error {
 			case <-ctx.Done():
 				return ctx.Err()
 			default:
-				fmt.Println("reading", file)
 				lines, err := reader.ReadLines(file)
 				if err != nil {
 					return err

@@ -1,11 +1,15 @@
 package tailer
 
 import (
+	"fmt"
+	"io"
 	"os"
+	"sync"
 )
 
 type CheckpointReader struct {
 	checkpoints map[string]Checkpoint
+	sync.Mutex
 }
 
 func NewCheckpointReader() *CheckpointReader {
@@ -14,21 +18,28 @@ func NewCheckpointReader() *CheckpointReader {
 	}
 }
 
-func (r *CheckpointReader) ReadLines(file string) (lines []string, err error) {
-	checkpoint := r.checkpoints[file]
+const MAX_READ_SIZE = 1024 * 1024 * 1024
+
+func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error) {
+	r.Lock()
+	defer r.Unlock()
+
+	checkpoint := r.checkpoints[fileName]
 	if checkpoint.File == nil {
-		checkpoint.File, err = os.Open(file)
+		file, err := os.Open(fileName)
 		if err != nil {
+			if os.IsNotExist(err) || os.IsPermission(err) {
+				return nil, nil
+			}
 			return nil, err
 		}
+		checkpoint.File = file
+		checkpoint.Offset = 0
 	}
 
-	_, err = checkpoint.File.Seek(checkpoint.Offset, 0)
-	if err != nil {
-		return nil, err
-	}
+	reader := io.NewSectionReader(checkpoint.File, checkpoint.Offset, MAX_READ_SIZE)
 
-	scanner, err := NewOffsetScanner(checkpoint.File)
+	scanner, err := NewOffsetScanner(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -37,14 +48,21 @@ func (r *CheckpointReader) ReadLines(file string) (lines []string, err error) {
 		lines = append(lines, scanner.Text())
 	}
 
-	checkpoint.Offset = scanner.Offset()
+	fmt.Printf("%s\t%d\t%d\t%d\n", fileName, len(lines), checkpoint.Offset, scanner.Offset())
+
+	checkpoint.Offset += scanner.Offset()
+	r.checkpoints[fileName] = checkpoint
 	return lines, nil
 }
 
 func (r *CheckpointReader) Close() error {
+	r.Lock()
+	defer r.Unlock()
+
 	for _, checkpoint := range r.checkpoints {
 		if checkpoint.File != nil {
 			checkpoint.File.Close()
+			checkpoint.File = nil
 		}
 	}
 	return nil
