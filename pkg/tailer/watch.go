@@ -12,10 +12,8 @@ import (
 type WatchFunc = func(file, line string) error
 
 func Watch(ctx context.Context, dir string, watchFunc WatchFunc) error {
-	files, err := NewFiles(dir)
-	if err != nil {
-		return err
-	}
+	files := NewFiles(dir)
+	go files.RunUpdater(ctx)
 
 	reader := NewCheckpointReader()
 	defer reader.Close()
