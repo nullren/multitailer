@@ -19,4 +19,6 @@ New files are found periodically and any changes to existing files (moved or tru
 
 The last-read position is also kept and periodically written to disk.
 
-A lot of this was modeled after reading [Vector.dev's kubernetes_logs source](https://github.com/vectordotdev/vector/blob/ab459399a7ca58c088dfbd30dd6c08f5799c929e/src/sources/kubernetes_logs/mod.rs#L825-L838).
+## Notes
+
+Inspiration came from originally reading [Vector.dev's kubernetes_logs source](https://github.com/vectordotdev/vector/blob/ab459399a7ca58c088dfbd30dd6c08f5799c929e/src/sources/kubernetes_logs/mod.rs#L825-L838) as it had a similar idea for checkpointing reads and periodically persisting them to disk.
