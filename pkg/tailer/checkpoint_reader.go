@@ -8,16 +8,19 @@ import (
 
 type CheckpointReader struct {
 	checkpoints map[string]Checkpoint
+
+	// maxReadSize is the maximum number of bytes to read from a file.
+	// this allows one large file to not dominate the read loop.
+	maxReadSize int64
 	sync.Mutex
 }
 
 func NewCheckpointReader() *CheckpointReader {
 	return &CheckpointReader{
 		checkpoints: make(map[string]Checkpoint),
+		maxReadSize: 1024 * 1024 * 1024,
 	}
 }
-
-const MAX_READ_SIZE = 1024 * 1024 * 1024
 
 // ReadLines reads lines from a file, starting from the last read position.
 func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error) {
@@ -37,7 +40,7 @@ func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error
 		checkpoint.Offset = 0
 	}
 
-	reader := io.NewSectionReader(checkpoint.File, checkpoint.Offset, MAX_READ_SIZE)
+	reader := io.NewSectionReader(checkpoint.File, checkpoint.Offset, r.maxReadSize)
 
 	scanner, err := NewBytesReadScanner(reader)
 	if err != nil {

@@ -23,14 +23,13 @@ func NewBytesReadScanner(r io.Reader) (*BytesReadScanner, error) {
 		defer func() {
 			bytesReadScanner.bytesRead += int64(advance)
 		}()
-		if atEOF && len(data) == 0 {
-			return 0, nil, nil
-		}
 		if i := bytes.IndexByte(data, '\n'); i >= 0 {
 			return i + 1, dropCR(data[0:i]), nil
 		}
 		if atEOF {
-			return len(data), dropCR(data), nil
+			// If we're at EOF, we have a final, non-terminated line.
+			// We should leave it alone until more data comes in.
+			return 0, nil, nil
 		}
 		return 0, nil, nil
 	})
