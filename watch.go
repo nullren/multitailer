@@ -12,10 +12,10 @@ import (
 // end the watch.
 type WatchFunc = func(file, line string) error
 
-// Watch watches a directory for files and new content and calls
-// watchFunc for each new line of content.
-func Watch(ctx context.Context, dir string, watchFunc WatchFunc) error {
-	files := NewFiles(dir)
+// Watch files for new content and call watchFunc for each new line of content.
+// Files are searched for using searchGlob.
+func Watch(ctx context.Context, searchGlob string, watchFunc WatchFunc) error {
+	files := NewFiles(searchGlob)
 	go files.RunUpdater(ctx)
 
 	reader := NewCheckpointReader()

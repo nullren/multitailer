@@ -3,23 +3,21 @@ package multitailer
 import (
 	"context"
 	"fmt"
-	"io/fs"
-	"os"
 	"path/filepath"
 	"sync"
 	"time"
 )
 
 type Files struct {
-	searchDir           string
+	searchGlob          string
 	filesUpdateInterval time.Duration
 	files               []string
 	sync.Mutex
 }
 
-func NewFiles(dir string) *Files {
+func NewFiles(searchGlob string) *Files {
 	return &Files{
-		searchDir:           dir,
+		searchGlob:          searchGlob,
 		filesUpdateInterval: 10 * time.Second,
 	}
 }
@@ -28,15 +26,8 @@ func (f *Files) UpdateFiles() error {
 	f.Lock()
 	defer f.Unlock()
 
-	var files []string
-	// TODO: filtering, max depth, etc.
-	if err := fs.WalkDir(os.DirFS(f.searchDir), ".", func(path string, d fs.DirEntry, err error) error {
-		if !d.IsDir() {
-			fullPath := filepath.Join(f.searchDir, path)
-			files = append(files, fullPath)
-		}
-		return nil
-	}); err != nil {
+	files, err := filepath.Glob(f.searchGlob)
+	if err != nil {
 		return err
 	}
 
