@@ -31,26 +31,13 @@ func (f *Files) UpdateFiles() error {
 		return err
 	}
 
-	fmt.Printf("found files: %v", files)
+	fmt.Printf("found files: %v\n", files)
 	f.files = files
 	return nil
 }
 
 func (f *Files) RunUpdater(ctx context.Context) {
-	timer := time.NewTicker(f.filesUpdateInterval)
-	defer timer.Stop()
-
-	// initial update
-	_ = f.UpdateFiles()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-timer.C:
-			_ = f.UpdateFiles()
-		}
-	}
+	PeriodicallyRun(ctx, f.filesUpdateInterval, f.UpdateFiles)
 }
 
 func (f *Files) Files() []string {

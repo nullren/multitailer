@@ -18,8 +18,12 @@ func Watch(ctx context.Context, searchGlob string, watchFunc WatchFunc) error {
 	files := NewFiles(searchGlob)
 	go files.RunUpdater(ctx)
 
-	reader := NewCheckpointReader()
+	reader, err := NewCheckpointReader()
+	if err != nil {
+		return err
+	}
 	defer reader.Close()
+	go reader.RunSaveCheckpoints(ctx)
 
 	for {
 		for _, file := range files.Files() {
