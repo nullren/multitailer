@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	searchGlob := flag.String("s", "/var/log/pods/*/*.log", "the search glob for files to tail")
+	searchGlob := flag.String("s", "/var/log/pods/*/*/*.log", "the search glob for files to tail")
 	flag.Parse()
 
 	if err := multitailer.Watch(context.Background(), *searchGlob, func(file, line string) error {
