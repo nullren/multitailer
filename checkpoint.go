@@ -30,7 +30,7 @@ func (c *Checkpoint) Check(fileName string) error {
 		return fmt.Errorf("not a syscall.Stat_t: %v", fileInfo.Sys())
 	}
 
-	// if we loaded a checkpoint from a file, the file may not be open yet
+	// we loaded a checkpoint from a file, so the file is not open yet
 	if c.File == nil && c.Offset > 0 {
 		file, err := os.Open(fileName)
 		if err != nil {
@@ -40,10 +40,13 @@ func (c *Checkpoint) Check(fileName string) error {
 			return fmt.Errorf("seek failed: %w", err)
 		}
 		c.File = file
+		// setting these avoids re-opening in the next check
+		c.Dev = stat.Dev
+		c.Ino = stat.Ino
+		c.Size = fileInfo.Size()
 	}
 
-	// if checkpoint is new (all values 0), or file was moved or truncated, re-open it
-
+	// file was moved or truncated, re-open it
 	if c.Size > fileInfo.Size() || c.Dev != stat.Dev || c.Ino != stat.Ino {
 		if c.File != nil {
 			_ = c.File.Close()
@@ -57,6 +60,8 @@ func (c *Checkpoint) Check(fileName string) error {
 		c.Dev = stat.Dev
 		c.Ino = stat.Ino
 	}
+
+	// always update the size
 	c.Size = fileInfo.Size()
 	return nil
 }
