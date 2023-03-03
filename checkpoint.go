@@ -9,7 +9,7 @@ import (
 type Checkpoint struct {
 	Offset int64
 	Size   int64
-	Dev    int32
+	Dev    uint64
 	Ino    uint64
 	File   *os.File `json:"-"`
 }
@@ -41,13 +41,13 @@ func (c *Checkpoint) Check(fileName string) error {
 		}
 		c.File = file
 		// setting these avoids re-opening in the next check
-		c.Dev = stat.Dev
+		c.Dev = uint64(stat.Dev)
 		c.Ino = stat.Ino
 		c.Size = fileInfo.Size()
 	}
 
 	// file was moved or truncated, re-open it
-	if c.Size > fileInfo.Size() || c.Dev != stat.Dev || c.Ino != stat.Ino {
+	if c.Size > fileInfo.Size() || c.Dev != uint64(stat.Dev) || c.Ino != stat.Ino {
 		if c.File != nil {
 			_ = c.File.Close()
 		}
