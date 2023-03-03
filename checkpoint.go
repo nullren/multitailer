@@ -57,7 +57,7 @@ func (c *Checkpoint) Check(fileName string) error {
 		}
 		c.File = file
 		c.Offset = 0
-		c.Dev = stat.Dev
+		c.Dev = uint64(stat.Dev)
 		c.Ino = stat.Ino
 	}
 
