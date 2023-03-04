@@ -18,7 +18,11 @@ func Watch(ctx context.Context, searchGlob string, watchFunc WatchFunc) error {
 	files := NewFiles(searchGlob)
 	go files.RunUpdater(ctx)
 
-	reader, err := NewCheckpointReader()
+	reader, err := NewCheckpointReader(CheckpointConfig{
+		SaveFile:     "/tmp/checkpoints.json",
+		SaveInterval: 30 * time.Second,
+		MaxReadBytes: 10 * 1024 * 1024,
+	})
 	if err != nil {
 		return err
 	}

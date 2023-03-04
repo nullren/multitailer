@@ -26,18 +26,26 @@ type CheckpointReader struct {
 	sync.Mutex
 }
 
+type CheckpointConfig struct {
+	// SaveFile is the file to save checkpoints to.
+	SaveFile string
+	// SaveInterval is the interval at which checkpoints are saved.
+	SaveInterval time.Duration
+	// MaxReadSize is the maximum number of bytes to read from a file.
+	MaxReadBytes int64
+}
+
 // NewCheckpointReader returns a new CheckpointReader.
-func NewCheckpointReader() (*CheckpointReader, error) {
-	checkpointsSaveFile := "/tmp/checkpoints.json"
-	checkpoints, err := LoadCheckpoints(checkpointsSaveFile)
+func NewCheckpointReader(config CheckpointConfig) (*CheckpointReader, error) {
+	checkpoints, err := LoadCheckpoints(config.SaveFile)
 	if err != nil {
 		return nil, fmt.Errorf("load checkpoints failed: %w", err)
 	}
 	return &CheckpointReader{
 		checkpoints:             checkpoints,
-		checkpointsSaveFile:     checkpointsSaveFile,
-		checkpointsSaveInterval: 30 * time.Second,
-		maxReadSize:             1024 * 1024 * 1024,
+		checkpointsSaveFile:     config.SaveFile,
+		checkpointsSaveInterval: config.SaveInterval,
+		maxReadSize:             config.MaxReadBytes,
 	}, nil
 }
 
