@@ -15,7 +15,7 @@ type WatchFunc = func(file, line string) error
 // Watch files for new content and call watchFunc for each new line of content.
 // Files are searched for using searchGlob.
 func Watch(ctx context.Context, searchGlob string, watchFunc WatchFunc) error {
-	files := NewFiles(searchGlob)
+	files := NewFiles(searchGlob, 10*time.Second)
 	go files.RunUpdater(ctx)
 
 	reader, err := NewCheckpointReader(CheckpointConfig{

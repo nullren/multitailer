@@ -15,10 +15,10 @@ type Files struct {
 	sync.Mutex
 }
 
-func NewFiles(searchGlob string) *Files {
+func NewFiles(searchGlob string, filesUpdateInterval time.Duration) *Files {
 	return &Files{
 		searchGlob:          searchGlob,
-		filesUpdateInterval: 10 * time.Second,
+		filesUpdateInterval: filesUpdateInterval,
 	}
 }
 
