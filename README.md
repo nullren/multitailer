@@ -21,6 +21,9 @@ type MultitailerConfig struct {
 
 	// FileMaxReadBytes is the maximum number of bytes to read from a file
 	FileMaxReadBytes int64
+
+	// FileLoopPauseTime is the time to pause between reading files.
+	FileLoopPauseTime time.Duration
 }
 
 // FollowFunc is a function that is called when a file has new content. It is
