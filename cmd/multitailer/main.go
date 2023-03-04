@@ -18,7 +18,8 @@ func main() {
 		CheckpointsSaveInterval: 5 * time.Second,
 		FileSearchGlob:          *searchGlob,
 		FileUpdateInterval:      5 * time.Second,
-		FileMaxReadBytes:        1024,
+		FileMaxReadBytes:        10 * 1024 * 1024,
+		FileLoopPauseTime:       1 * time.Second,
 	})
 	if err != nil {
 		panic(err)

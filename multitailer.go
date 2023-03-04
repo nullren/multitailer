@@ -21,6 +21,9 @@ type MultitailerConfig struct {
 
 	// FileMaxReadBytes is the maximum number of bytes to read from a file
 	FileMaxReadBytes int64
+
+	// FileLoopPauseTime is the time to pause between reading files.
+	FileLoopPauseTime time.Duration
 }
 
 // FollowFunc is a function that is called when a file has new content. It is
@@ -29,8 +32,9 @@ type MultitailerConfig struct {
 type FollowFunc = func(file, line string) error
 
 type Multitailer struct {
-	files  *Files
-	reader *CheckpointReader
+	files     *Files
+	reader    *CheckpointReader
+	pauseTime time.Duration
 }
 
 func NewMultitailer(config MultitailerConfig) (*Multitailer, error) {
@@ -44,8 +48,9 @@ func NewMultitailer(config MultitailerConfig) (*Multitailer, error) {
 		return nil, err
 	}
 	return &Multitailer{
-		files:  files,
-		reader: reader,
+		files:     files,
+		reader:    reader,
+		pauseTime: config.FileLoopPauseTime,
 	}, nil
 }
 
@@ -74,6 +79,6 @@ func (m *Multitailer) Follow(ctx context.Context, followFunc FollowFunc) error {
 				fmt.Printf("read %d lines from %s\n", len(lines), file)
 			}
 		}
-		time.Sleep(1 * time.Second)
+		time.Sleep(m.pauseTime)
 	}
 }
