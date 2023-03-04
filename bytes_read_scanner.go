@@ -6,7 +6,8 @@ import (
 	"io"
 )
 
-// BytesReadScanner is a bufio.Scanner that also keeps track of the number of bytes read.
+// BytesReadScanner is a bufio.Scanner that also keeps track of the number of
+// bytes read.
 type BytesReadScanner struct {
 	bytesRead int64
 	*bufio.Scanner
@@ -27,8 +28,8 @@ func NewBytesReadScanner(r io.Reader) (*BytesReadScanner, error) {
 			return i + 1, dropCR(data[0:i]), nil
 		}
 		if atEOF {
-			// If we're at EOF, we have a final, non-terminated line.
-			// We should leave it alone until more data comes in.
+			// If we're at EOF, we have a final, non-terminated line. We should
+			// leave it alone until more data comes in.
 			return 0, nil, nil
 		}
 		return 0, nil, nil

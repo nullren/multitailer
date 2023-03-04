@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-// CheckpointReader reads lines from files, starting from the last read position.
-// To read a file, call ReadLines with the file name. The file will be opened
-// and read from the last read position. The file will be closed when the
+// CheckpointReader reads lines from files, starting from the last read
+// position. To read a file, call ReadLines with the file name. The file will be
+// opened and read from the last read position. The file will be closed when the
 // CheckpointReader is closed. If the file is deleted, it will be ignored.
 type CheckpointReader struct {
 	checkpoints map[string]Checkpoint
@@ -20,8 +20,8 @@ type CheckpointReader struct {
 	checkpointsSaveFile     string
 	checkpointsSaveInterval time.Duration
 
-	// maxReadSize is the maximum number of bytes to read from a file.
-	// this allows one large file to not dominate the read loop.
+	// maxReadSize is the maximum number of bytes to read from a file. this
+	// allows one large file to not dominate the read loop.
 	maxReadSize int64
 	sync.Mutex
 }
@@ -59,8 +59,8 @@ func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error
 		return nil, fmt.Errorf("checkpoint check failed: %w", err)
 	}
 
-	// restrict the read size to maxReadSize so that one large file
-	// doesn't dominate the read loop.
+	// restrict the read size to maxReadSize so that one large file doesn't
+	// dominate the read loop.
 	reader := io.NewSectionReader(checkpoint.File, checkpoint.Offset, r.maxReadSize)
 	scanner, err := NewBytesReadScanner(reader)
 	if err != nil {

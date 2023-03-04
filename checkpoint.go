@@ -16,9 +16,9 @@ type Checkpoint struct {
 
 // Check checks if the file has changed, and re-opens it if it has.
 func (c *Checkpoint) Check(fileName string) error {
-	// if the file is a symlink, stat will return the info for the target
-	// the symlink points to — which is what we want. Lstat would return
-	// the info for the symlink itself.
+	// if the file is a symlink, stat will return the info for the target the
+	// symlink points to — which is what we want. Lstat would return the info
+	// for the symlink itself.
 	fileInfo, err := os.Stat(fileName)
 	if err != nil {
 		if os.IsNotExist(err) || os.IsPermission(err) {

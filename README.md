@@ -1,7 +1,7 @@
 # multitailer
 
 Multitailer is a Go library to tail and follow multiple files. The primary means of using
-this libary is using the `Watch` function which an example of is in `cmd/multitailer/main.go`.
+this libary is using the `Follow` function which an example of is in `cmd/multitailer/main.go`.
 
 ```go
 // WatchFunc is a function that is called when a file has
