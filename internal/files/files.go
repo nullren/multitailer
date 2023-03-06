@@ -10,21 +10,25 @@ import (
 	"github.com/nullren/multitailer/internal/utils"
 )
 
-type Files struct {
+// Store is a struct that holdes the current files that should be tailed.
+type Store struct {
 	searchGlob          string
 	filesUpdateInterval time.Duration
 	files               []string
 	sync.Mutex
 }
 
-func NewFiles(searchGlob string, filesUpdateInterval time.Duration) *Files {
-	return &Files{
+// NewStore creates a new files Store that will search for files matching the
+// searchGlob and refresh the list of files every filesUpdateInterval.
+func NewStore(searchGlob string, filesUpdateInterval time.Duration) *Store {
+	return &Store{
 		searchGlob:          searchGlob,
 		filesUpdateInterval: filesUpdateInterval,
 	}
 }
 
-func (f *Files) UpdateFiles() error {
+// UpdateFiles updates the list of files to tail.
+func (f *Store) UpdateFiles() error {
 	f.Lock()
 	defer f.Unlock()
 
@@ -38,11 +42,13 @@ func (f *Files) UpdateFiles() error {
 	return nil
 }
 
-func (f *Files) RunUpdater(ctx context.Context) {
+// RunUpdater runs the UpdateFiles function periodically.
+func (f *Store) RunUpdater(ctx context.Context) {
 	utils.PeriodicallyRun(ctx, f.filesUpdateInterval, f.UpdateFiles)
 }
 
-func (f *Files) Files() []string {
+// Files returns the list of files to tail.
+func (f *Store) Files() []string {
 	f.Lock()
 	defer f.Unlock()
 

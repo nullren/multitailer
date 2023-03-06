@@ -35,13 +35,13 @@ type MultitailerConfig struct {
 type FollowFunc = func(file, line string) error
 
 type Multitailer struct {
-	files     *files.Files
+	files     *files.Store
 	reader    *checkpointer.Reader
 	pauseTime time.Duration
 }
 
 func NewMultitailer(config MultitailerConfig) (*Multitailer, error) {
-	files := files.NewFiles(config.FileSearchGlob, config.FileUpdateInterval)
+	files := files.NewStore(config.FileSearchGlob, config.FileUpdateInterval)
 	reader, err := checkpointer.NewReader(checkpointer.Config{
 		SaveFile:     config.CheckpointsSaveFile,
 		SaveInterval: config.CheckpointsSaveInterval,
