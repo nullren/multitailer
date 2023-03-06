@@ -22,10 +22,11 @@ type MultitailerConfig struct {
 	// FileUpdateInterval is the interval to update the list of files to watch.
 	FileUpdateInterval time.Duration
 
-	// FileMaxReadBytes is the maximum number of bytes to read from a file
+	// FileMaxReadBytes is the maximum number of bytes to read from a file.
 	FileMaxReadBytes int64
 
-	// FileLoopPauseTime is the time to pause between reading files.
+	// FileLoopPauseTime is the time to pause after reading all files and before
+	// starting the loop again.
 	FileLoopPauseTime time.Duration
 }
 
