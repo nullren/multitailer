@@ -38,8 +38,8 @@ type CheckpointConfig struct {
 	MaxReadBytes int64
 }
 
-// NewCheckpointReader returns a new CheckpointReader.
-func NewCheckpointReader(config CheckpointConfig) (*Reader, error) {
+// NewReader returns a new Reader but first trying to load existing checkpoints.
+func NewReader(config CheckpointConfig) (*Reader, error) {
 	checkpoints, err := LoadCheckpoints(config.SaveFile)
 	if err != nil {
 		return nil, fmt.Errorf("load checkpoints failed: %w", err)
