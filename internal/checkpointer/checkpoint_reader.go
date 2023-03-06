@@ -1,4 +1,4 @@
-package multitailer
+package checkpointer
 
 import (
 	"context"
@@ -8,6 +8,9 @@ import (
 	"os"
 	"sync"
 	"time"
+
+	"github.com/nullren/multitailer/internal/scanner"
+	"github.com/nullren/multitailer/internal/utils"
 )
 
 // CheckpointReader reads lines from files, starting from the last read
@@ -62,7 +65,7 @@ func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error
 	// restrict the read size to maxReadSize so that one large file doesn't
 	// dominate the read loop.
 	reader := io.NewSectionReader(checkpoint.File, checkpoint.Offset, r.maxReadSize)
-	scanner, err := NewBytesReadScanner(reader)
+	scanner, err := scanner.NewBytesReadScanner(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +93,7 @@ func (r *CheckpointReader) SaveCheckpoints() error {
 }
 
 func (r *CheckpointReader) RunSaveCheckpoints(ctx context.Context) {
-	PeriodicallyRun(ctx, r.checkpointsSaveInterval, r.SaveCheckpoints)
+	utils.PeriodicallyRun(ctx, r.checkpointsSaveInterval, r.SaveCheckpoints)
 }
 
 // LoadCheckpoints loads checkpoints from a file.

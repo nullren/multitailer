@@ -1,4 +1,4 @@
-package multitailer
+package scanner
 
 import (
 	"bufio"

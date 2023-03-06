@@ -1,4 +1,4 @@
-package multitailer
+package checkpointer
 
 import (
 	"fmt"

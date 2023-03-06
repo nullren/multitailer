@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"time"
+
+	"github.com/nullren/multitailer/internal/checkpointer"
+	"github.com/nullren/multitailer/internal/files"
 )
 
 type MultitailerConfig struct {
@@ -32,14 +35,14 @@ type MultitailerConfig struct {
 type FollowFunc = func(file, line string) error
 
 type Multitailer struct {
-	files     *Files
-	reader    *CheckpointReader
+	files     *files.Files
+	reader    *checkpointer.CheckpointReader
 	pauseTime time.Duration
 }
 
 func NewMultitailer(config MultitailerConfig) (*Multitailer, error) {
-	files := NewFiles(config.FileSearchGlob, config.FileUpdateInterval)
-	reader, err := NewCheckpointReader(CheckpointConfig{
+	files := files.NewFiles(config.FileSearchGlob, config.FileUpdateInterval)
+	reader, err := checkpointer.NewCheckpointReader(checkpointer.CheckpointConfig{
 		SaveFile:     config.CheckpointsSaveFile,
 		SaveInterval: config.CheckpointsSaveInterval,
 		MaxReadBytes: config.FileMaxReadBytes,

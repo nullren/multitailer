@@ -1,4 +1,4 @@
-package multitailer
+package files
 
 import (
 	"context"
@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/nullren/multitailer/internal/utils"
 )
 
 type Files struct {
@@ -37,7 +39,7 @@ func (f *Files) UpdateFiles() error {
 }
 
 func (f *Files) RunUpdater(ctx context.Context) {
-	PeriodicallyRun(ctx, f.filesUpdateInterval, f.UpdateFiles)
+	utils.PeriodicallyRun(ctx, f.filesUpdateInterval, f.UpdateFiles)
 }
 
 func (f *Files) Files() []string {
