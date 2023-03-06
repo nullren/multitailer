@@ -29,7 +29,7 @@ type Reader struct {
 	sync.Mutex
 }
 
-type CheckpointConfig struct {
+type Config struct {
 	// SaveFile is the file to save checkpoints to.
 	SaveFile string
 	// SaveInterval is the interval at which checkpoints are saved.
@@ -39,7 +39,7 @@ type CheckpointConfig struct {
 }
 
 // NewReader returns a new Reader but first trying to load existing checkpoints.
-func NewReader(config CheckpointConfig) (*Reader, error) {
+func NewReader(config Config) (*Reader, error) {
 	checkpoints, err := LoadCheckpoints(config.SaveFile)
 	if err != nil {
 		return nil, fmt.Errorf("load checkpoints failed: %w", err)

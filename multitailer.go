@@ -42,7 +42,7 @@ type Multitailer struct {
 
 func NewMultitailer(config MultitailerConfig) (*Multitailer, error) {
 	files := files.NewFiles(config.FileSearchGlob, config.FileUpdateInterval)
-	reader, err := checkpointer.NewReader(checkpointer.CheckpointConfig{
+	reader, err := checkpointer.NewReader(checkpointer.Config{
 		SaveFile:     config.CheckpointsSaveFile,
 		SaveInterval: config.CheckpointsSaveInterval,
 		MaxReadBytes: config.FileMaxReadBytes,
