@@ -36,7 +36,7 @@ type FollowFunc = func(file, line string) error
 
 type Multitailer struct {
 	files     *files.Files
-	reader    *checkpointer.CheckpointReader
+	reader    *checkpointer.Reader
 	pauseTime time.Duration
 }
 

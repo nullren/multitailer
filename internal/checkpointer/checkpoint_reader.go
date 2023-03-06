@@ -13,11 +13,11 @@ import (
 	"github.com/nullren/multitailer/internal/utils"
 )
 
-// CheckpointReader reads lines from files, starting from the last read
+// Reader reads lines from files, starting from the last read
 // position. To read a file, call ReadLines with the file name. The file will be
 // opened and read from the last read position. The file will be closed when the
-// CheckpointReader is closed. If the file is deleted, it will be ignored.
-type CheckpointReader struct {
+// Reader is closed. If the file is deleted, it will be ignored.
+type Reader struct {
 	checkpoints map[string]Checkpoint
 
 	checkpointsSaveFile     string
@@ -39,12 +39,12 @@ type CheckpointConfig struct {
 }
 
 // NewCheckpointReader returns a new CheckpointReader.
-func NewCheckpointReader(config CheckpointConfig) (*CheckpointReader, error) {
+func NewCheckpointReader(config CheckpointConfig) (*Reader, error) {
 	checkpoints, err := LoadCheckpoints(config.SaveFile)
 	if err != nil {
 		return nil, fmt.Errorf("load checkpoints failed: %w", err)
 	}
-	return &CheckpointReader{
+	return &Reader{
 		checkpoints:             checkpoints,
 		checkpointsSaveFile:     config.SaveFile,
 		checkpointsSaveInterval: config.SaveInterval,
@@ -53,7 +53,7 @@ func NewCheckpointReader(config CheckpointConfig) (*CheckpointReader, error) {
 }
 
 // ReadLines reads lines from a file, starting from the last read position.
-func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error) {
+func (r *Reader) ReadLines(fileName string) (lines []string, err error) {
 	r.Lock()
 	defer r.Unlock()
 
@@ -78,7 +78,7 @@ func (r *CheckpointReader) ReadLines(fileName string) (lines []string, err error
 	return lines, nil
 }
 
-func (r *CheckpointReader) SaveCheckpoints() error {
+func (r *Reader) SaveCheckpoints() error {
 	r.Lock()
 	defer r.Unlock()
 	bytes, err := json.Marshal(r.checkpoints)
@@ -92,7 +92,7 @@ func (r *CheckpointReader) SaveCheckpoints() error {
 	return nil
 }
 
-func (r *CheckpointReader) RunSaveCheckpoints(ctx context.Context) {
+func (r *Reader) RunSaveCheckpoints(ctx context.Context) {
 	utils.PeriodicallyRun(ctx, r.checkpointsSaveInterval, r.SaveCheckpoints)
 }
 
@@ -114,7 +114,7 @@ func LoadCheckpoints(checkpoingsFile string) (map[string]Checkpoint, error) {
 }
 
 // Close closes all open files.
-func (r *CheckpointReader) Close() error {
+func (r *Reader) Close() error {
 	r.Lock()
 	defer r.Unlock()
 
